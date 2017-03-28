@@ -1,0 +1,46 @@
+{
+  "description": "GraphQL Lodash",
+  "scripts": {
+    "start": "webpack-dev-server --config webpack.demo.js",
+    "build": "webpack -p --config webpack.config.js"
+  },
+  "dependencies": {
+    "graphql": "^0.9.1",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "@types/graphql": "^0.9.0",
+    "@types/lodash": "^4.14.58",
+    "@types/react": "^15.0.20",
+    "@types/react-dom": "^0.14.23",
+    "@types/webpack": "^2.2.12",
+    "awesome-typescript-loader": "^3.1.2",
+    "graphiql": "^0.9.3",
+    "isomorphic-fetch": "^2.2.1",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "typescript": "^2.2.2",
+    "webpack": "^2.3.2",
+    "webpack-dev-server": "^2.4.2"
+  },
+  "name": "graphql-lodash",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/APIs-guru/graphql-lodash.git"
+  },
+  "keywords": [
+    "GraphQL",
+    "lodash",
+    "underscore",
+    "fp",
+    "functional"
+  ],
+  "author": "APIs.guru <founders@apis.guru>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/APIs-guru/graphql-lodash/issues"
+  },
+  "homepage": "https://github.com/APIs-guru/graphql-lodash#readme"
+}

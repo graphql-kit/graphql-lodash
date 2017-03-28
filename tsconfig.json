@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "target": "es5",
+    "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "outDir": "lib",
+    "pretty": true,
+    "types": [
+      "webpack"
+    ],
+    "lib": ["es2016", "DOM"],
+    "jsx": "react"
+  },
+  "compileOnSave": false,
+  "exclude": [
+    "node_modules",
+    ".tmp",
+    "lib"
+  ],
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.tsx",
+    "./manual-types.d.ts"
+  ],
+  "awesomeTypescriptLoaderOptions": {
+    "resolveGlobs": true,
+    "useWebpackText": true
+  }
+}
