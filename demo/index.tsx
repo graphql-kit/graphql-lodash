@@ -5,8 +5,13 @@ import * as ReactDOM from 'react-dom';
 import GraphiQL from 'graphiql';
 
 import fetch from 'isomorphic-fetch';
+import {
+  extendSchema,
+  buildClientSchema,
+  introspectionQuery,
+} from 'graphql';
 
-import { graphqlLodash } from '../src/';
+import { graphqlLodash, lodashDirectiveAST } from '../src/';
 
 export interface DemoState {
 }
@@ -20,20 +25,55 @@ export class Demo extends React.Component<null, DemoState> {
   componentDidMount() {
   }
 
-  fetcher(graphQLParams) {
-    console.log(graphqlLodash());
-    return fetch('http://swapi.apis.guru', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(graphQLParams),
-    }).then(response => response.json());
+  request(graphQLParams) {
+    const [queryWithoutLodash, lodashTransform] = graphqlLodash(graphQLParams);
+    return fetcher({
+      ...graphQLParams,
+      query: queryWithoutLodash,
+    }).then(lodashTransform);
   }
 
   render() {
     return (
-      <GraphiQL fetcher={this.fetcher}/>
+      <GraphiQL fetcher={this.request} schema={schema}/>
     )
   }
 }
 
-ReactDOM.render(<Demo />, document.getElementById('container'));
+const fetcher = getFetcher('http://swapi.apis.guru');
+let schema;
+getIntrospection(fetcher)
+ .then(introspection => {
+   schema = buildClientSchema(introspection.data);
+   schema = extendSchema(schema, lodashDirectiveAST);
+   ReactDOM.render(<Demo/>, document.getElementById('container'));
+ });
+
+
+function getIntrospection(fetcher) {
+  return fetcher({query: introspectionQuery})
+    .then(introspection => {
+      if (introspection.errors)
+        throw Error(JSON.stringify(introspection.errors, null, 2));
+      return introspection;
+    });
+}
+
+function getFetcher(url, headersObj?) {
+  return (graphQLParams) => {
+    return fetch(url, {
+      method: 'POST',
+      headers: new Headers({
+        "content-type": 'application/json',
+        ...headersObj,
+      }),
+      body: JSON.stringify(graphQLParams)
+    }).then(responce => {
+      if (responce.ok)
+        return responce.json();
+      return responce.text().then(body => {
+        throw Error(`${responce.status} ${responce.statusText}\n${body}`);
+      });
+    })
+  };
+}
