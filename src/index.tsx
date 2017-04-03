@@ -24,8 +24,14 @@ export function graphqlLodash(graphQLParams) {
       if (node.name.value !== lodashDirective.name)
         return;
 
-      const values = getArgumentValues(lodashDirective, node);
-      pathToArgs.push([resultPath, values]);
+      const args = getArgumentValues(lodashDirective, node);
+      //Restore order of arguments
+      const argsNames = node.arguments.map(node => node.name.value);
+      const orderedArgs = {};
+      for (const name of argsNames)
+        orderedArgs[name] = args[name];
+
+      pathToArgs.push([resultPath, orderedArgs]);
     },
   });
 
@@ -35,7 +41,6 @@ export function graphqlLodash(graphQLParams) {
   return [print(stripQuery(queryAST)), result => {
     const data = result.data;
     for (const [path, operations] of pathToArgs) {
-      console.log(path);
       applyOnPath(data, path, object => {
         for (const op in operations) {
           const args = operations[op];
@@ -53,10 +58,8 @@ export function graphqlLodash(graphQLParams) {
               object = _.map(object, args.path);
           }
         }
-        console.log(JSON.stringify(object, null, 2));
         return object;
       });
-      console.log(JSON.stringify(data, null, 2));
     }
     return result;
   }];
