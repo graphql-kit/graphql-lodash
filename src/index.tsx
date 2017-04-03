@@ -35,44 +35,55 @@ export function graphqlLodash(graphQLParams) {
   return [print(stripQuery(queryAST)), result => {
     const data = result.data;
     for (const [path, operations] of pathToArgs) {
-      const key = path.pop();
-      // FIXME: skip arrays in path
-      const parentObject = getObjectByPath(data, path);
-      if (parentObject === null)
-        continue;
-
-      let object = parentObject[key];
-      if (object === null)
-        continue;
-
-      for (const op in operations) {
-        const args = operations[op];
-        switch (op) {
-          case 'get':
-            object = _.get(object, args.path);
-            break;
-          case 'keyBy':
-            object = (_ as any).keyBy(object, args.path);
-            break;
-          case 'mapValues':
-            object = _.mapValues(object, args.path);
-            break;
+      console.log(path);
+      applyOnPath(data, path, object => {
+        for (const op in operations) {
+          const args = operations[op];
+          switch (op) {
+            case 'get':
+              object = _.get(object, args.path);
+              break;
+            case 'keyBy':
+              object = (_ as any).keyBy(object, args.path);
+              break;
+            case 'mapValues':
+              object = _.mapValues(object, args.path);
+              break;
+            case 'map':
+              object = _.map(object, args.path);
+          }
         }
-      }
-      parentObject[key] = object;
+        console.log(JSON.stringify(object, null, 2));
+        return object;
+      });
+      console.log(JSON.stringify(data, null, 2));
     }
     return result;
   }];
 }
 
-function getObjectByPath(root, path) {
-  let result = root;
-  for (const key of path) {
-    result = result[key];
-    if (result === null)
-      break;
+function applyOnPath(root, path, cb) {
+  traverse(root, 0);
+
+  function traverse(root, pathIndex) {
+    const key = path[pathIndex];
+    const value = root[key];
+
+    if (value === null || value === undefined)
+      return;
+
+    if (pathIndex + 1 === path.length) {
+      root[key] = cb(value);
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value)
+        traverse(item, pathIndex + 1);
+    }
+    else
+      traverse(value, pathIndex + 1);
   }
-  return result;
 }
 
 function stripQuery(queryAST) {
