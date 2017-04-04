@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-//import { buildSchema, extendSchema, parse } from 'graphql';
 
 import GraphiQL from 'graphiql';
 
@@ -13,24 +12,17 @@ import {
 
 import { graphqlLodash, lodashDirectiveAST } from '../src/';
 
-export interface DemoState {
-}
-
-export class Demo extends React.Component<null, DemoState> {
+export class Demo extends React.Component<null, null> {
   constructor() {
     super();
-    this.state = {};
-  }
-
-  componentDidMount() {
   }
 
   request(graphQLParams) {
-    const [queryWithoutLodash, lodashTransform] = graphqlLodash(graphQLParams);
+    const {query, transform} = graphqlLodash(graphQLParams);
     return fetcher({
       ...graphQLParams,
-      query: queryWithoutLodash,
-    }).then(lodashTransform);
+      query,
+    }).then(transform);
   }
 
   render() {

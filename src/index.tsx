@@ -38,10 +38,10 @@ export function graphqlLodash(graphQLParams) {
   pathToArgs.sort(([a], [b]) => b.length - a.length);
   // TODO: detect duplicates
 
-  return [
-    print(stripQuery(queryAST)),
-    result => applyLodashDirective(pathToArgs, result)
-  ];
+  return {
+    query: print(stripQuery(queryAST)),
+    transform: result => applyLodashDirective(pathToArgs, result)
+  };
 }
 
 function applyLodashDirective(pathToArgs, result) {
