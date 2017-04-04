@@ -38,31 +38,36 @@ export function graphqlLodash(graphQLParams) {
   pathToArgs.sort(([a], [b]) => b.length - a.length);
   // TODO: detect duplicates
 
-  return [print(stripQuery(queryAST)), result => {
-    const data = result.data;
-    for (const [path, operations] of pathToArgs) {
-      applyOnPath(data, path, object => {
-        for (const op in operations) {
-          const args = operations[op];
-          switch (op) {
-            case 'get':
-              object = _.get(object, args.path);
-              break;
-            case 'keyBy':
-              object = (_ as any).keyBy(object, args.path);
-              break;
-            case 'mapValues':
-              object = _.mapValues(object, args.path);
-              break;
-            case 'map':
-              object = _.map(object, args.path);
-          }
+  return [
+    print(stripQuery(queryAST)),
+    result => applyLodashDirective(pathToArgs, result)
+  ];
+}
+
+function applyLodashDirective(pathToArgs, result) {
+  const data = result.data;
+  for (const [path, operations] of pathToArgs) {
+    applyOnPath(data, path, object => {
+      for (const op in operations) {
+        const args = operations[op];
+        switch (op) {
+          case 'get':
+            object = _.get(object, args.path);
+            break;
+          case 'keyBy':
+            object = (_ as any).keyBy(object, args.path);
+            break;
+          case 'mapValues':
+            object = _.mapValues(object, args.path);
+            break;
+          case 'map':
+            object = _.map(object, args.path);
         }
-        return object;
-      });
-    }
-    return result;
-  }];
+      }
+      return object;
+    });
+  }
+  return result;
 }
 
 function applyOnPath(root, path, cb) {
