@@ -49,19 +49,19 @@ function applyLodashDirective(pathToArgs, result) {
   for (const [path, operations] of pathToArgs) {
     applyOnPath(data, path, object => {
       for (const op in operations) {
-        const args = operations[op];
+        const arg = operations[op];
         switch (op) {
           case 'get':
-            object = _.get(object, args.path);
+            object = _.get(object, arg);
             break;
           case 'keyBy':
-            object = (_ as any).keyBy(object, args.path);
+            object = (_ as any).keyBy(object, arg);
             break;
           case 'mapValues':
-            object = _.mapValues(object, args.path);
+            object = _.mapValues(object, arg);
             break;
           case 'map':
-            object = _.map(object, args.path);
+            object = _.map(object, arg);
         }
       }
       return object;
@@ -104,32 +104,12 @@ function stripQuery(queryAST) {
 }
 
 const lodashIDL = `
-input lodash__get {
-  path: String!
-}
-
-input lodash__map {
-  path: String!
-}
-
-input lodash__mapValues {
-  path: String!
-}
-
-input lodash__keyBy {
-  path: String!
-}
-
-input lodash__join {
-  separator: String = ","
-}
-
 directive @_(
-  get: lodash__get
-  map: lodash__map
-  keyBy: lodash__keyBy
-  mapValues: lodash__mapValues
-  join: lodash__join
+  get: String
+  map: String
+  keyBy: String
+  mapValues: String
+  join: String = ","
 ) on FIELD
 `;
 
