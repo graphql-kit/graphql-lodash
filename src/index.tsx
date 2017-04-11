@@ -20,23 +20,16 @@ export function graphqlLodash(graphQLParams) {
   const pathToArgs = [];
   const queryAST = parse(graphQLParams.query);
   traverseOperation(queryAST, graphQLParams.operationName, {
-    [Kind.DIRECTIVE]: (node, _0, _1, _2, _3, resultPath) => {
-      if (node.name.value !== lodashDirective.name)
-        return;
+    [Kind.DIRECTIVE]: {
+      leave(node, _0, _1, _2, _3, resultPath) {
+        var args = getLodashDirectiveArgs(node);
 
-      const args = getArgumentValues(lodashDirective, node);
-      //Restore order of arguments
-      const argsNames = node.arguments.map(node => node.name.value);
-      const orderedArgs = {};
-      for (const name of argsNames)
-        orderedArgs[name] = args[name];
-
-      pathToArgs.push([resultPath, orderedArgs]);
+        // TODO: detect duplicates
+        if (args !== null)
+          _.set(pathToArgs, [...resultPath, '@_'], args);
+      },
     },
   });
-
-  pathToArgs.sort(([a], [b]) => b.length - a.length);
-  // TODO: detect duplicates
 
   return {
     query: print(stripQuery(queryAST)),
@@ -44,53 +37,66 @@ export function graphqlLodash(graphQLParams) {
   };
 }
 
-function applyLodashDirective(pathToArgs, result) {
-  const data = result.data;
-  for (const [path, operations] of pathToArgs) {
-    applyOnPath(data, path, object => {
-      for (const op in operations) {
-        const arg = operations[op];
-        switch (op) {
-          case 'get':
-            object = _.get(object, arg);
-            break;
-          case 'keyBy':
-            object = (_ as any).keyBy(object, arg);
-            break;
-          case 'mapValues':
-            object = _.mapValues(object, arg);
-            break;
-          case 'map':
-            object = _.map(object, arg);
-        }
-      }
-      return object;
-    });
-  }
-  return result;
+function getLodashDirectiveArgs(node) {
+  if (node.name.value !== lodashDirective.name)
+    return null;
+
+  const args = getArgumentValues(lodashDirective, node);
+  //Restore order of arguments
+  const argsNames = node.arguments.map(node => node.name.value);
+  const orderedArgs = {};
+  for (const name of argsNames)
+    orderedArgs[name] = args[name];
+  return orderedArgs;
 }
 
-function applyOnPath(root, path, cb) {
-  traverse(root, 0);
+function applyLodashDirective(pathToArgs, result) {
+  const data = result.data;
+  if (data === null)
+    return null;
 
-  function traverse(root, pathIndex) {
-    const key = path[pathIndex];
-    const value = root[key];
-
-    if (value === null || value === undefined)
-      return;
-
-    if (pathIndex + 1 === path.length) {
-      root[key] = cb(value);
-      return;
+  const changedData = applyOnPath(data, pathToArgs, (object, lodashArgs) => {
+    for (const op in lodashArgs) {
+      const arg = lodashArgs[op];
+      switch (op) {
+        case 'get':
+          object = _.get(object, arg);
+          break;
+        case 'keyBy':
+          object = (_ as any).keyBy(object, arg);
+          break;
+        case 'mapValues':
+          object = _.mapValues(object, arg);
+          break;
+        case 'map':
+          object = _.map(object, arg);
+      }
     }
+    return object;
+  });
 
-    if (Array.isArray(value)) {
-      for (const item of value)
-        traverse(item, pathIndex + 1);
+  return {...result, data: changedData};
+}
+
+function applyOnPath(result, pathToArgs, cb) {
+  return traverse(result, pathToArgs);
+
+  function traverse(root, pathRoot) {
+    if (Array.isArray(root))
+      return root.map(item => traverse(item, pathRoot));
+
+    const changedObject = Object.assign(root);
+    for (const key in pathRoot) {
+      if (key === '@_')
+        continue;
+
+      let changedValue = traverse(root[key], pathRoot[key]);
+      const lodashArgs = pathRoot[key]['@_'];
+      if (lodashArgs)
+        changedValue = cb(changedValue, lodashArgs);
+      changedObject[key] = changedValue;
     }
-    else
-      traverse(value, pathIndex + 1);
+    return changedObject;
   }
 }
 
