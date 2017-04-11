@@ -17,12 +17,14 @@ import {
 import * as _ from 'lodash';
 
 export function graphqlLodash(graphQLParams) {
-  const pathToArgs = [];
+  const pathToArgs = {};
   const queryAST = parse(graphQLParams.query);
   traverseOperation(queryAST, graphQLParams.operationName, {
-    [Kind.DIRECTIVE]: {
+    [Kind.FIELD]: {
       leave(node, _0, _1, _2, _3, resultPath) {
         var args = getLodashDirectiveArgs(node);
+        if (args !== null)
+        console.log(resultPath);
 
         // TODO: detect duplicates
         if (args !== null)
@@ -31,19 +33,30 @@ export function graphqlLodash(graphQLParams) {
     },
   });
 
+
   return {
     query: print(stripQuery(queryAST)),
     transform: data => applyLodashDirective(pathToArgs, data)
   };
 }
 
-function getLodashDirectiveArgs(node) {
-  if (node.name.value !== lodashDirective.name)
+function getLodashDirectiveArgs(fieldNode) {
+  let lodashNode = null;
+
+  for (let directive of fieldNode.directives) {
+    if (directive.name.value !== lodashDirectiveDef.name)
+      continue;
+    if (lodashNode)
+      throw Error(`Duplicating "@_" on the "${fieldNode.name.value}" `);
+    lodashNode = directive;
+  }
+
+  if (lodashNode === null)
     return null;
 
-  const args = getArgumentValues(lodashDirective, node);
+  const args = getArgumentValues(lodashDirectiveDef, lodashNode);
   //Restore order of arguments
-  const argsNames = node.arguments.map(node => node.name.value);
+  const argsNames = lodashNode.arguments.map(node => node.name.value);
   const orderedArgs = {};
   for (const name of argsNames)
     orderedArgs[name] = args[name];
@@ -118,7 +131,7 @@ directive @_(
 `;
 
 export const lodashDirectiveAST = parse(new Source(lodashIDL, 'lodashIDL'));
-const lodashDirective = getDirectivesFromAST(lodashDirectiveAST)[0];
+const lodashDirectiveDef = getDirectivesFromAST(lodashDirectiveAST)[0];
 
 function getDirectivesFromAST(ast) {
   const dummyIDL = `
@@ -167,15 +180,15 @@ function traverseOperation(queryAST, operationName, visitor) {
       leave(...args) {
         const node = args[0];
 
-        if (node.kind === Kind.FIELD)
-          resultPath.pop();
-
         const fn = getVisitFn(visitor, node.kind, /* isLeaving */ true);
         if (fn) {
           const result = fn.apply(visitor, [...args, resultPath.slice()]);
           if (result !== undefined)
             throw new GraphQLError('Can not change operation during traverse.');
         }
+
+        if (node.kind === Kind.FIELD)
+          resultPath.pop();
       }
     });
   }
