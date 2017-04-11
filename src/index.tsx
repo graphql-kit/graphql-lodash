@@ -23,16 +23,19 @@ export function graphqlLodash(graphQLParams) {
     [Kind.FIELD]: {
       leave(node, _0, _1, _2, _3, resultPath) {
         var args = getLodashDirectiveArgs(node);
-        if (args !== null)
-        console.log(resultPath);
+        if (args === null)
+          return;
 
-        // TODO: detect duplicates
-        if (args !== null)
-          _.set(pathToArgs, [...resultPath, '@_'], args);
+        // TODO: error if transformation applied on field that already
+        // seen without any transformation
+        const argsSetPath = [...resultPath, '@_'];
+        const previousArgsValue = _.get(pathToArgs, argsSetPath, null);
+        if (previousArgsValue !== null && !_.isEqual(previousArgsValue, args))
+          throw Error(`Different "@_" args for the "${argsSetPath.join('.')}" path`);
+        _.set(pathToArgs, argsSetPath, args);
       },
     },
   });
-
 
   return {
     query: print(stripQuery(queryAST)),
@@ -47,7 +50,7 @@ function getLodashDirectiveArgs(fieldNode) {
     if (directive.name.value !== lodashDirectiveDef.name)
       continue;
     if (lodashNode)
-      throw Error(`Duplicating "@_" on the "${fieldNode.name.value}" `);
+      throw Error(`Duplicating "@_" on the "${fieldNode.name.value}"`);
     lodashNode = directive;
   }
 
