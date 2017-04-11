@@ -31,7 +31,7 @@ export function graphqlLodash(graphQLParams) {
         const argsSetPath = [...resultPath, '@_'];
         const previousArgsValue = _.get(pathToArgs, argsSetPath, null);
         if (previousArgsValue !== null && !_.isEqual(previousArgsValue, args))
-          throw Error(`Different "@_" args for the "${argsSetPath.join('.')}" path`);
+          throw Error(`Different "@_" args for the "${resultPath.join('.')}" path`);
         _.set(pathToArgs, argsSetPath, args);
       },
     },
@@ -164,7 +164,6 @@ function traverseOperation(queryAST, operationName, visitor) {
   const resultPath = [];
   traverse(operationAST);
 
-  // TODO: account for field aliases
   function traverse(root) {
     visit(root, {
       enter(...args) {
@@ -172,6 +171,14 @@ function traverseOperation(queryAST, operationName, visitor) {
 
         if (node.kind === Kind.FIELD)
           resultPath.push((node.alias || node.name).value);
+
+        if (node.kind === Kind.FRAGMENT_SPREAD) {
+          const fragmentName = node.name.value;
+          const fragment = fragments[fragmentName];
+          if (!fragment)
+            throw Error(`Unknown fragment: ${fragmentName}`);
+          traverse(fragment);
+        }
 
         const fn = getVisitFn(visitor, node.kind, /* isLeaving */ false);
         if (fn) {
