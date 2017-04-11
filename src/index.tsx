@@ -33,7 +33,7 @@ export function graphqlLodash(graphQLParams) {
 
   return {
     query: print(stripQuery(queryAST)),
-    transform: result => applyLodashDirective(pathToArgs, result)
+    transform: data => applyLodashDirective(pathToArgs, data)
   };
 }
 
@@ -50,8 +50,7 @@ function getLodashDirectiveArgs(node) {
   return orderedArgs;
 }
 
-function applyLodashDirective(pathToArgs, result) {
-  const data = result.data;
+function applyLodashDirective(pathToArgs, data) {
   if (data === null)
     return null;
 
@@ -74,8 +73,7 @@ function applyLodashDirective(pathToArgs, result) {
     }
     return object;
   });
-
-  return {...result, data: changedData};
+  return changedData;
 }
 
 function applyOnPath(result, pathToArgs, cb) {

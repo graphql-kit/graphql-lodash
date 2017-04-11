@@ -22,7 +22,7 @@ export class Demo extends React.Component<null, null> {
     return fetcher({
       ...graphQLParams,
       query,
-    }).then(transform);
+    }).then(result => ({...result, data: transform(result.data)}));
   }
 
   render() {
