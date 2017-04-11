@@ -16,10 +16,10 @@ import {
 
 import * as _ from 'lodash';
 
-export function graphqlLodash(graphQLParams) {
+export function graphqlLodash(query, operationName?) {
   const pathToArgs = {};
-  const queryAST = parse(graphQLParams.query);
-  traverseOperation(queryAST, graphQLParams.operationName, {
+  const queryAST = typeof query === 'string' ? parse(query) : query;
+  traverseOperation(queryAST, operationName, {
     [Kind.FIELD]: {
       leave(node, _0, _1, _2, _3, resultPath) {
         var args = getLodashDirectiveArgs(node);

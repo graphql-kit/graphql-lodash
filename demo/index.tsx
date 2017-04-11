@@ -18,7 +18,11 @@ export class Demo extends React.Component<null, null> {
   }
 
   request(graphQLParams) {
-    const {query, transform} = graphqlLodash(graphQLParams);
+    const {query, transform} = graphqlLodash(
+      graphQLParams.query,
+      graphQLParams.operationName
+    );
+
     return fetcher({
       ...graphQLParams,
       query,
