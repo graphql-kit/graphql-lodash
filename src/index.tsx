@@ -96,6 +96,8 @@ function applyOnPath(result, pathToArgs, cb) {
   return traverse(result, pathToArgs);
 
   function traverse(root, pathRoot) {
+    if (root === null || root === undefined)
+      return null;
     if (Array.isArray(root))
       return root.map(item => traverse(item, pathRoot));
 
@@ -105,6 +107,9 @@ function applyOnPath(result, pathToArgs, cb) {
         continue;
 
       let changedValue = traverse(root[key], pathRoot[key]);
+      if (changedValue === null || changedValue === undefined)
+        continue;
+
       const lodashArgs = pathRoot[key]['@_'];
       if (lodashArgs)
         changedValue = cb(changedValue, lodashArgs);
