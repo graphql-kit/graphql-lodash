@@ -66,26 +66,40 @@ function getLodashDirectiveArgs(fieldNode) {
   return orderedArgs;
 }
 
+const transformations = {
+  Array: {
+    map: (array, arg) => _.map(array, arg),
+    keyBy: (array, arg) => _.keyBy(array, arg),
+  },
+  Object: {
+    get: (object, arg) => _.get(object, arg),
+    mapValues: (object, arg) => _.mapValues(object, arg),
+  }
+};
+
+const transformationToType = {};
+for (const type in transformations) {
+  for (const name in transformations[type]) {
+    transformationToType[name] = type;
+  }
+}
+
 function applyLodashDirective(pathToArgs, data) {
   if (data === null)
     return null;
 
-  const changedData = applyOnPath(data, pathToArgs, (object, lodashArgs) => {
+  const changedData = applyOnPath(data, pathToArgs, (path, object, lodashArgs) => {
     for (const op in lodashArgs) {
       const arg = lodashArgs[op];
-      switch (op) {
-        case 'get':
-          object = _.get(object, arg);
-          break;
-        case 'keyBy':
-          object = (_ as any).keyBy(object, arg);
-          break;
-        case 'mapValues':
-          object = _.mapValues(object, arg);
-          break;
-        case 'map':
-          object = _.map(object, arg);
+      const type = transformationToType[op];
+      const actualType = object.constructor.name;
+      if (type !== actualType) {
+        const pathStr = path.join('.');
+        throw Error(
+          `${pathStr}: "${op}" transformation expect "${type}" but got "${actualType}"`
+        );
       }
+      object = transformations[type][op](object, arg);
     }
     return object;
   });
@@ -93,6 +107,7 @@ function applyLodashDirective(pathToArgs, data) {
 }
 
 function applyOnPath(result, pathToArgs, cb) {
+  const currentPath = [];
   return traverse(result, pathToArgs);
 
   function traverse(root, pathRoot) {
@@ -105,6 +120,7 @@ function applyOnPath(result, pathToArgs, cb) {
     for (const key in pathRoot) {
       if (key === '@_')
         continue;
+      currentPath.push(key);
 
       let changedValue = traverse(root[key], pathRoot[key]);
       if (changedValue === null || changedValue === undefined)
@@ -112,8 +128,9 @@ function applyOnPath(result, pathToArgs, cb) {
 
       const lodashArgs = pathRoot[key]['@_'];
       if (lodashArgs)
-        changedValue = cb(changedValue, lodashArgs);
+        changedValue = cb(currentPath, changedValue, lodashArgs);
       changedObject[key] = changedValue;
+      currentPath.pop();
     }
     return changedObject;
   }
@@ -130,11 +147,12 @@ function stripQuery(queryAST) {
 
 const lodashIDL = `
 directive @_(
-  get: String
   map: String
   keyBy: String
-  mapValues: String
   join: String = ","
+
+  get: String
+  mapValues: String
 ) on FIELD
 `;
 
