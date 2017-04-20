@@ -19,22 +19,18 @@ import * as _ from 'lodash';
 export function graphqlLodash(query, operationName?) {
   const pathToArgs = {};
   const queryAST = typeof query === 'string' ? parse(query) : query;
-  traverseOperation(queryAST, operationName, {
-    [Kind.FIELD]: {
-      leave(node, _0, _1, _2, _3, resultPath) {
-        var args = getLodashDirectiveArgs(node);
-        if (args === null)
-          return;
+  traverseOperationFields(queryAST, operationName, (node, resultPath) => {
+    var args = getLodashDirectiveArgs(node);
+    if (args === null)
+      return;
 
-        // TODO: error if transformation applied on field that already
-        // seen without any transformation
-        const argsSetPath = [...resultPath, '@_'];
-        const previousArgsValue = _.get(pathToArgs, argsSetPath, null);
-        if (previousArgsValue !== null && !_.isEqual(previousArgsValue, args))
-          throw Error(`Different "@_" args for the "${resultPath.join('.')}" path`);
-        _.set(pathToArgs, argsSetPath, args);
-      },
-    },
+    // TODO: error if transformation applied on field that already
+    // seen without any transformation
+    const argsSetPath = [...resultPath, '@_'];
+    const previousArgsValue = _.get(pathToArgs, argsSetPath, null);
+    if (previousArgsValue !== null && !_.isEqual(previousArgsValue, args))
+      throw Error(`Different "@_" args for the "${resultPath.join('.')}" path`);
+    _.set(pathToArgs, argsSetPath, args);
   });
 
   return {
@@ -271,7 +267,7 @@ function astToJSON(ast) {
   }
 }
 
-function traverseOperation(queryAST, operationName, visitor) {
+function traverseOperationFields(queryAST, operationName, cb) {
   const fragments = {};
   const operationAST = getOperationAST(queryAST, operationName);
   if (!operationAST) {
@@ -290,9 +286,7 @@ function traverseOperation(queryAST, operationName, visitor) {
 
   function traverse(root) {
     visit(root, {
-      enter(...args) {
-        const node = args[0];
-
+      enter(node) {
         if (node.kind === Kind.FIELD)
           resultPath.push((node.alias || node.name).value);
 
@@ -303,60 +297,13 @@ function traverseOperation(queryAST, operationName, visitor) {
             throw Error(`Unknown fragment: ${fragmentName}`);
           traverse(fragment);
         }
-
-        const fn = getVisitFn(visitor, node.kind, /* isLeaving */ false);
-        if (fn) {
-          const result = fn.apply(visitor, [...args, resultPath.slice()]);
-          if (result !== undefined)
-            throw new GraphQLError('Can not change operation during traverse.');
-        }
       },
-      leave(...args) {
-        const node = args[0];
-
-        const fn = getVisitFn(visitor, node.kind, /* isLeaving */ true);
-        if (fn) {
-          const result = fn.apply(visitor, [...args, resultPath.slice()]);
-          if (result !== undefined)
-            throw new GraphQLError('Can not change operation during traverse.');
-        }
-
-        if (node.kind === Kind.FIELD)
-          resultPath.pop();
+      leave(node) {
+        if (node.kind !== Kind.FIELD)
+          return;
+        cb(node, resultPath);
+        resultPath.pop();
       }
     });
-  }
-}
-
-/**
- * Given a visitor instance, if it is leaving or not, and a node kind, return
- * the function the visitor runtime should call.
- */
-function getVisitFn(visitor, kind, isLeaving) {
-  const kindVisitor = visitor[kind];
-  if (kindVisitor) {
-    if (!isLeaving && typeof kindVisitor === 'function') {
-      // { Kind() {} }
-      return kindVisitor;
-    }
-    const kindSpecificVisitor =
-      isLeaving ? kindVisitor.leave : kindVisitor.enter;
-    if (typeof kindSpecificVisitor === 'function') {
-      // { Kind: { enter() {}, leave() {} } }
-      return kindSpecificVisitor;
-    }
-  } else {
-    const specificVisitor = isLeaving ? visitor.leave : visitor.enter;
-    if (specificVisitor) {
-      if (typeof specificVisitor === 'function') {
-        // { enter() {}, leave() {} }
-        return specificVisitor;
-      }
-      const specificKindVisitor = specificVisitor[kind];
-      if (typeof specificKindVisitor === 'function') {
-        // { enter: { Kind() {} }, leave: { Kind() {} } }
-        return specificKindVisitor;
-      }
-    }
   }
 }
