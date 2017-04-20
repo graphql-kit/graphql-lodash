@@ -152,7 +152,7 @@ directive @_(
   takeRight: Int
 
   # Recursively flatten array up to depth times.
-  flatten: Int
+  flattenDepth: Int
 
   # The inverse of \`toPairs\`; this method returns an object composed from key-value
   # pairs.
@@ -212,11 +212,37 @@ const transformations = {
   Array: {
     map: (array, path) => _.map(array, path),
     keyBy: (array, path) => _.keyBy(array, path),
+    chunk: (array, size) => _.chunk(array, size),
+    drop: (array, n) => _.drop(array, n),
+    dropRight: (array, n) => _.drop(array, n),
+    take: (array, n) => _.take(array, n),
+    takeRight: (array, n) => _.takeRight(array, n),
+    flattenDepth: (array, depth) => _.flattenDepth(array, depth),
+    fromPairs: (array) => _.fromPairs(array),
+    nth: (array, n) => _.nth(array, n),
+    reverse: (array) => _.reverse(array),
+    uniq: (array) => _.uniq(array),
+    uniqBy: (array, path) => _.uniqBy(array, path),
+    countBy: (array, path) => _.countBy(array, path),
+    filter: (array, value) => _.filter(array, value),
+    reject: (array, value) => _.reject(array, value),
+    groupBy: (array, path) => _.groupBy(array, path),
+    sortBy: (array, paths) => _.sortBy(array, paths),
+    minBy: (array, path) => _.minBy(array, path),
+    maxBy: (array, path) => _.maxBy(array, path),
+    meanBy: (array, path) => _.meanBy(array, path),
+    sumBy: (array, path) => _.sumBy(array, path),
     join: (array, sep) => _.join(array, sep),
   },
   Object: {
     get: (object, path) => _.get(object, path),
     mapValues: (object, path) => _.mapValues(object, path),
+    at: (object, paths) => _.at(object, paths),
+    toPairs: (object) => _.toPairs(object),
+    invert: (object) => _.invert(object),
+    invertBy: (object, path) => _.invertBy(object, path),
+    keys: (object) => _.keys(object),
+    values: (object) => _.values(object),
   }
 };
 
