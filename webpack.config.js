@@ -18,7 +18,10 @@ module.exports = {
   output: {
     path: root('lib'),
     filename: 'graphql-lodash.bundle.js',
-    sourceMapFilename: '[file].map'
+    sourceMapFilename: '[file].map',
+    library: 'GQLLodash',
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   module: {
     rules: [
