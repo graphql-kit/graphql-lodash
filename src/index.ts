@@ -8,6 +8,7 @@ import {
   print,
   concatAST,
   buildASTSchema,
+  DocumentNode
 } from 'graphql';
 
 import {
@@ -140,7 +141,7 @@ function stripQuery(queryAST) {
   });
 }
 
-export const lodashDirectiveAST = parse(new Source(lodashIDL, 'lodashIDL'));
+export const lodashDirectiveAST:DocumentNode = parse(new Source(lodashIDL, 'lodashIDL'));
 const lodashDirectiveDef = getDirectivesFromAST(lodashDirectiveAST)[0];
 const lodashDirectiveArgTypes = lodashDirectiveDef.args.reduce((obj, arg) => {
   obj[arg.name] = arg.type;

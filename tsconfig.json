@@ -9,6 +9,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
+    "declaration": true,
     "outDir": "lib",
     "pretty": true,
     "types": [
