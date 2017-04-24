@@ -8,7 +8,7 @@ import {
   print,
   concatAST,
   buildASTSchema,
-  DocumentNode
+  DocumentNode,
 } from 'graphql';
 
 import {
