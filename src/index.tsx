@@ -14,7 +14,14 @@ import {
   getArgumentValues,
 } from 'graphql/execution/values';
 
-import * as _ from 'lodash';
+import get from 'lodash/get.js';
+import set from 'lodash/set.js';
+import isEqual from 'lodash/isEqual.js';
+
+import {
+  transformations,
+  transformationToType
+} from './transformations';
 
 export function graphqlLodash(query, operationName?) {
   const pathToArgs = {};
@@ -28,10 +35,10 @@ export function graphqlLodash(query, operationName?) {
     // TODO: error if transformation applied on field that already
     // seen without any transformation
     const argsSetPath = [...resultPath, '@_'];
-    const previousArgsValue = _.get(pathToArgs, argsSetPath, null);
-    if (previousArgsValue !== null && !_.isEqual(previousArgsValue, args))
+    const previousArgsValue = get(pathToArgs, argsSetPath, null);
+    if (previousArgsValue !== null && !isEqual(previousArgsValue, args))
       throw Error(`Different "@_" args for the "${resultPath.join('.')}" path`);
-    _.set(pathToArgs, argsSetPath, args);
+    set(pathToArgs, argsSetPath, args);
   });
 
   const stripedQuery = stripQuery(queryAST);
@@ -132,12 +139,12 @@ function stripQuery(queryAST) {
 }
 
 const lodashIDL = `
- scalar Path
- scalar JSON
+scalar Path
+scalar JSON
 
- enum DummyArgument {
-   _
- }
+enum DummyArgument {
+  none
+}
 
 directive @_(
   map: Path
@@ -215,51 +222,6 @@ directive @_(
   values: DummyArgument
 ) on FIELD
 `;
-
-const transformations = {
-  Array: {
-    map: _.map,
-    keyBy: _.keyBy,
-    chunk: _.chunk,
-    drop: _.drop,
-    dropRight: _.dropRight,
-    take: _.take,
-    takeRight: _.takeRight,
-    flattenDepth: _.flattenDepth,
-    fromPairs: _.fromPairs,
-    nth: _.nth,
-    reverse: _.reverse,
-    uniq: _.uniq,
-    uniqBy: _.uniqBy,
-    countBy: _.countBy,
-    filter: _.filter,
-    reject: _.reject,
-    groupBy: _.groupBy,
-    sortBy: _.sortBy,
-    minBy: _.minBy,
-    maxBy: _.maxBy,
-    meanBy: _.meanBy,
-    sumBy: _.sumBy,
-    join: _.join,
-  },
-  Object: {
-    get: _.get,
-    mapValues: _.mapValues,
-    at: _.at,
-    toPairs: _.toPairs,
-    invert: _.invert,
-    invertBy: _.invertBy,
-    keys: _.keys,
-    values: _.values,
-  }
-};
-
-const transformationToType = {};
-for (const type in transformations) {
-  for (const name in transformations[type]) {
-    transformationToType[name] = type;
-  }
-}
 
 export const lodashDirectiveAST = parse(new Source(lodashIDL, 'lodashIDL'));
 const lodashDirectiveDef = getDirectivesFromAST(lodashDirectiveAST)[0];
