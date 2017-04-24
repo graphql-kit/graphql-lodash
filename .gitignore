@@ -39,3 +39,4 @@ jspm_packages
 
 # output
 /lib
+/demo/bundle*
