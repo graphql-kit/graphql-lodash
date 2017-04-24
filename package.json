@@ -30,7 +30,7 @@
   },
   "name": "graphql-lodash",
   "version": "0.0.0",
-  "main": "lib/index.js",
+  "main": "lib/graphql-lodash.bundle.js",
   "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
   "types": "lib/index.d.ts",
