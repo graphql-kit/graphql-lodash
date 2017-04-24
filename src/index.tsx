@@ -18,7 +18,8 @@ import * as _ from 'lodash';
 
 export function graphqlLodash(query, operationName?) {
   const pathToArgs = {};
-  const queryAST = typeof query === 'string' ? parse(query) : query;
+  const isQueryPassedAsString = typeof query === 'string';
+  const queryAST = isQueryPassedAsString ? parse(query) : query;
   traverseOperationFields(queryAST, operationName, (node, resultPath) => {
     var args = getLodashDirectiveArgs(node);
     if (args === null)
@@ -33,8 +34,9 @@ export function graphqlLodash(query, operationName?) {
     _.set(pathToArgs, argsSetPath, args);
   });
 
+  const stripedQuery = stripQuery(queryAST);
   return {
-    query: print(stripQuery(queryAST)),
+    query: isQueryPassedAsString ? print(stripedQuery) : stripedQuery,
     transform: data => applyLodashDirective(pathToArgs, data)
   };
 }
