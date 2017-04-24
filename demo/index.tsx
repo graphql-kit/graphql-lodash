@@ -36,7 +36,7 @@ export class Demo extends React.Component<null, null> {
   }
 }
 
-const fetcher = getFetcher('http://swapi.apis.guru');
+const fetcher = getFetcher('https://swapi.apis.guru');
 let schema;
 getIntrospection(fetcher)
  .then(introspection => {
