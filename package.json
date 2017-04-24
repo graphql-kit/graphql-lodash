@@ -6,7 +6,7 @@
     "deploy": "deploy-to-gh-pages --local demo",
     "tsc": "tsc",
     "build:bundle": "webpack -p --config webpack.config.js",
-    "build:release": "npm run tsc && npm run build:bundle"
+    "build:package": "rimraf lib/ && npm run tsc && npm run build:bundle"
   },
   "dependencies": {
     "graphql": "^0.9.3",
@@ -23,6 +23,7 @@
     "isomorphic-fetch": "^2.2.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
+    "rimraf": "^2.6.1",
     "typescript": "^2.2.2",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.4.4"
