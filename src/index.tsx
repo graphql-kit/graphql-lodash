@@ -55,12 +55,18 @@ function getLodashDirectiveArgs(fieldNode) {
   if (lodashNode === null)
     return null;
 
+
   const args = getArgumentValues(lodashDirectiveDef, lodashNode);
   //Restore order of arguments
   const argsNames = lodashNode.arguments.map(node => node.name.value);
   const orderedArgs = {};
-  for (const name of argsNames)
-    orderedArgs[name] = args[name];
+  for (const name of argsNames) {
+    if (lodashDirectiveArgTypes[name].name === 'DummyArgument')
+      orderedArgs[name] = undefined;
+    else
+      orderedArgs[name] = args[name];
+  }
+
   return orderedArgs;
 }
 
@@ -212,39 +218,39 @@ directive @_(
 
 const transformations = {
   Array: {
-    map: (array, path) => _.map(array, path),
-    keyBy: (array, path) => _.keyBy(array, path),
-    chunk: (array, size) => _.chunk(array, size),
-    drop: (array, n) => _.drop(array, n),
-    dropRight: (array, n) => _.drop(array, n),
-    take: (array, n) => _.take(array, n),
-    takeRight: (array, n) => _.takeRight(array, n),
-    flattenDepth: (array, depth) => _.flattenDepth(array, depth),
-    fromPairs: (array) => _.fromPairs(array),
-    nth: (array, n) => _.nth(array, n),
-    reverse: (array) => _.reverse(array),
-    uniq: (array) => _.uniq(array),
-    uniqBy: (array, path) => _.uniqBy(array, path),
-    countBy: (array, path) => _.countBy(array, path),
-    filter: (array, value) => _.filter(array, value),
-    reject: (array, value) => _.reject(array, value),
-    groupBy: (array, path) => _.groupBy(array, path),
-    sortBy: (array, paths) => _.sortBy(array, paths),
-    minBy: (array, path) => _.minBy(array, path),
-    maxBy: (array, path) => _.maxBy(array, path),
-    meanBy: (array, path) => _.meanBy(array, path),
-    sumBy: (array, path) => _.sumBy(array, path),
-    join: (array, sep) => _.join(array, sep),
+    map: _.map,
+    keyBy: _.keyBy,
+    chunk: _.chunk,
+    drop: _.drop,
+    dropRight: _.dropRight,
+    take: _.take,
+    takeRight: _.takeRight,
+    flattenDepth: _.flattenDepth,
+    fromPairs: _.fromPairs,
+    nth: _.nth,
+    reverse: _.reverse,
+    uniq: _.uniq,
+    uniqBy: _.uniqBy,
+    countBy: _.countBy,
+    filter: _.filter,
+    reject: _.reject,
+    groupBy: _.groupBy,
+    sortBy: _.sortBy,
+    minBy: _.minBy,
+    maxBy: _.maxBy,
+    meanBy: _.meanBy,
+    sumBy: _.sumBy,
+    join: _.join,
   },
   Object: {
-    get: (object, path) => _.get(object, path),
-    mapValues: (object, path) => _.mapValues(object, path),
-    at: (object, paths) => _.at(object, paths),
-    toPairs: (object) => _.toPairs(object),
-    invert: (object) => _.invert(object),
-    invertBy: (object, path) => _.invertBy(object, path),
-    keys: (object) => _.keys(object),
-    values: (object) => _.values(object),
+    get: _.get,
+    mapValues: _.mapValues,
+    at: _.at,
+    toPairs: _.toPairs,
+    invert: _.invert,
+    invertBy: _.invertBy,
+    keys: _.keys,
+    values: _.values,
   }
 };
 
@@ -257,6 +263,10 @@ for (const type in transformations) {
 
 export const lodashDirectiveAST = parse(new Source(lodashIDL, 'lodashIDL'));
 const lodashDirectiveDef = getDirectivesFromAST(lodashDirectiveAST)[0];
+const lodashDirectiveArgTypes = lodashDirectiveDef.args.reduce((obj, arg) => {
+  obj[arg.name] = arg.type;
+  return obj;
+}, {});
 
 function getDirectivesFromAST(ast) {
   const dummyIDL = `
