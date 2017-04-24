@@ -5,26 +5,27 @@
     "build:demo": "webpack -p --config demo/webpack.demo.js",
     "deploy": "deploy-to-gh-pages --local demo",
     "tsc": "tsc",
-    "build:bundle": "webpack -p --config webpack.config.js"
+    "build:bundle": "webpack -p --config webpack.config.js",
+    "build:release": "npm run tsc && npm run build:bundle"
   },
   "dependencies": {
-    "graphql": "^0.9.1",
+    "graphql": "^0.9.3",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
     "@types/graphql": "^0.9.0",
-    "@types/lodash": "^4.14.58",
-    "@types/react": "^15.0.20",
-    "@types/react-dom": "^0.14.23",
-    "@types/webpack": "^2.2.12",
+    "@types/lodash": "^4.14.63",
+    "@types/react": "^15.0.22",
+    "@types/react-dom": "^15.5.0",
+    "@types/webpack": "^2.2.15",
     "awesome-typescript-loader": "^3.1.2",
-    "graphiql": "^0.9.3",
+    "graphiql": "^0.10.1",
     "isomorphic-fetch": "^2.2.1",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
     "typescript": "^2.2.2",
-    "webpack": "^2.3.2",
-    "webpack-dev-server": "^2.4.2"
+    "webpack": "^2.4.1",
+    "webpack-dev-server": "^2.4.4"
   },
   "name": "graphql-lodash",
   "version": "0.0.0",
