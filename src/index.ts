@@ -2,14 +2,16 @@ import {
   Source,
   Kind,
   parse,
-  GraphQLError,
   visit,
-  getOperationAST,
   print,
-  concatAST,
-  buildASTSchema,
   DocumentNode,
-} from 'graphql';
+} from 'graphql/language';
+
+import { GraphQLError } from 'graphql/error/GraphQLError';
+
+import { getOperationAST } from 'graphql/utilities/getOperationAST';
+import { concatAST } from 'graphql/utilities/concatAST';
+import { buildASTSchema } from 'graphql/utilities/buildASTSchema';
 
 import {
   getArgumentValues,
