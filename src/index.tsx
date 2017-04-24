@@ -23,7 +23,7 @@ import {
   transformationToType
 } from './transformations';
 
-import lodashIDL from './lodash_idl';
+import { lodashIDL } from './lodash_idl';
 
 export function graphqlLodash(query, operationName?) {
   const pathToArgs = {};

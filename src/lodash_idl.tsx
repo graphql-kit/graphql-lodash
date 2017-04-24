@@ -1,4 +1,4 @@
-const lodashIDL = `
+export const lodashIDL = `
 scalar Path
 scalar JSON
 
@@ -82,5 +82,3 @@ directive @_(
   values: DummyArgument
 ) on FIELD
 `;
-
-export default lodashIDL;
