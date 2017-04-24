@@ -1,8 +1,9 @@
 {
   "description": "GraphQL Lodash",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.demo.js",
-    "build": "webpack -p --config webpack.config.js"
+    "start": "webpack-dev-server --config demo/webpack.demo.js",
+    "build-demo": "webpack -p --config demo/webpack.demo.js",
+    "deploy": "deploy-to-gh-pages --local demo"
   },
   "dependencies": {
     "graphql": "^0.9.1",

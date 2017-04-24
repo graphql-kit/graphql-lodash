@@ -20,7 +20,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json']
   },
-  entry: ['./demo/index.tsx'],
+  entry: ['./demo/index.ts'],
   output: {
     path: root('demo'),
     filename: 'bundle.js',
