@@ -1,4 +1,7 @@
 # GraphQL Lodash
+[![npm](https://img.shields.io/npm/v/graphql-lodash.svg)](https://www.npmjs.com/package/graphql-lodash) [![David](https://img.shields.io/david/APIs-guru/graphql-lodash.svg)](https://david-dm.org/APIs-guru/graphql-lodash)
+[![David](https://img.shields.io/david/dev/APIs-guru/graphql-lodash.svg)](https://david-dm.org/APIs-guru/graphql-lodash?type=dev)
+[![npm](https://img.shields.io/npm/l/graphql-lodash.svg)](https://github.com/APIs-guru/graphql-lodash/blob/master/LICENSE)
 
 ![GraphQL Lodash logo](docs/gqlodash-logo.png)
 
