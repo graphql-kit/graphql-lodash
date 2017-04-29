@@ -11,12 +11,38 @@
       #container {
         height: 100vh;
       }
+
+      .tab-top .form-horizontal > .form-group:first-child {
+        display: none;
+      }
+      .graphiql-toolbar .dropzone, .graphiql-toolbar > button, .graphiql-toolbar > br {
+        display: none;
+      }
+
+      .form-horizontal > .form-group:last-child {
+        margin-bottom: 0;
+      }
+      /* safari fix */
+      .graphiql-tool-cont1 {
+        display: flex;
+      }
+
+      .graphiql-tool-cont1 > div {
+        height: auto;
+      }
     </style>
     <title> GraphQL Lodash by APIs.guru </title>
-    <link href="https://cdn.jsdelivr.net/graphiql/0.8.1/graphiql.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" media="screen" href="//maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+    <link href="bundle.css" rel="stylesheet">
   </head>
   <body>
     <div id="container" clsss="app-container"></div>
     <script src="./bundle.js"></script>
+    <a target="_blank" href="https://github.com/APIs-guru/graphql-lodash" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 80 80" enable-background="new 0 0 80 80" xml:space="preserve"><path fill="#444444" d="M80 80V0L45.4 34.6l-3.8 8.6h-4.8L0 80H80z"/>
+        <path fill="#FFFFFF" d="M43 47c-1.2 0.4-3.7 1.8-2.8 5.1 0 0 0.6 2-0.7 3.5 0 0-1.3 1.4-0.9-0.7 0 0 0.5-1.3-0.5-3.5 0 0-1.7-3.2 3-6.2" class="octo-arm"/>
+        <path fill="#FFFFFF" d="M45.4 34.6c-0.1 0-0.6 1.3-0.3 1.7l3.7 3.7c1.3 1.3 1.7 2.6 1.6 3.5 3.4-2.7 7.7-4.7 13 0.5 1.5 1.5 2.2 3.2 2.3 5.1 0.5 0.2 2.3 1.1 3.5 3.7 0 0-0.8 1.5-5.2 2.3 -0.8 1.4-1.8 2.8-2.9 3.9 -1.2 1.2-2.5 2.2-3.9 2.9 -0.9 4.4-2.4 5.2-2.4 5.2 -2.6-1.1-3.6-3-3.7-3.5 -1.8-0.1-3.6-0.8-5.1-2.2 -5.2-5.2-3.2-9.6-0.5-13 -0.7 0.1-1.7-0.2-2.7-1l-4.4-4.4c-0.4-0.4-1.6 0.1-1.5 0.1L45.4 34.6z"/>
+      </svg></a>
+    <style>.github-corner {height: 80px; position: fixed; bottom: 0; right: 0; z-index: 10;}</style>
   </body>
 </html>

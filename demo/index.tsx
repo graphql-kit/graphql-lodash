@@ -1,75 +1,179 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import GraphiQL from 'graphiql';
-
 import fetch from 'isomorphic-fetch';
+import Modal from 'react-modal';
+
+
 import {
   extendSchema,
   buildClientSchema,
   introspectionQuery,
 } from 'graphql';
 
-import { graphqlLodash, lodashDirectiveAST } from '../src/';
+import { GraphiQLTab, AppConfig, TabConfig } from 'graphiql-workspace';
 
-export class Demo extends React.Component<null, null> {
+import 'graphiql-workspace/graphiql-workspace.css';
+import 'graphiql/graphiql.css';
+
+
+import { graphqlLodash, lodashDirectiveAST } from '../src/';
+import { defaultQuery, savedQueries } from './queries';
+
+// monkey patch updateSchema
+// TODO:
+GraphiQLTab.prototype.updateSchema = function() {
+  const fetch = this.fetcher({query: introspectionQuery});
+
+  return fetch.then(result => {
+    if (result && result.data) {
+      let schema = buildClientSchema(result.data);
+      schema = extendSchema(schema, lodashDirectiveAST);
+      this.setState({schema, schemaError: false});
+    } else {
+      this.setState({schemaError: true});
+    }
+  }).catch(_ => {
+    this.setState({schemaError: true});
+  });
+}
+
+const workspaceOptions = {
+  defaultQuery,
+  defaultSavedQueries:
+
+  savedQueries
+};
+
+const defaultTabConfig = {
+  name:'',
+  url: 'https://swapi.apis.guru',
+  headers: [],
+  query: defaultQuery,
+  maxHistory: 10,
+  variables: ''
+};
+
+export class Demo extends React.Component<null, any> {
   constructor() {
     super();
+    let config = new AppConfig("graphiql", workspaceOptions);
+
+    let tab = new TabConfig('tab', defaultTabConfig);
+
+    this.state = {
+      config, tab,
+      modalIsOpen: !('lodash-demo:helpModalWasClosed' in localStorage)
+    }
   }
 
-  request(graphQLParams) {
+  onToolbar(action) {
+    if (action == "clean") {
+      this.state.appConfig.cleanup();
+      this.state.config.cleanup();
+      const appConfig = new AppConfig("graphiql", workspaceOptions)
+      let config = new TabConfig('tab', defaultTabConfig);
+
+      this.setState({
+        appConfig,
+        config,
+        queryUpdate: {
+          query: workspaceOptions.defaultQuery
+        }
+      })
+    }
+  }
+
+  fetcher(graphQLParams, {url, headers}:{url: string, headers:Map<string, string>}) {
     const {query, transform} = graphqlLodash(
       graphQLParams.query,
       graphQLParams.operationName
     );
 
-    return fetcher({
-      ...graphQLParams,
-      query,
-    }).then(result => ({...result, data: transform(result.data)}));
-  }
-
-  render() {
-    return (
-      <GraphiQL fetcher={this.request} schema={schema}/>
-    )
-  }
-}
-
-const fetcher = getFetcher('https://swapi.apis.guru');
-let schema;
-getIntrospection(fetcher)
- .then(introspection => {
-   schema = buildClientSchema(introspection.data);
-   schema = extendSchema(schema, lodashDirectiveAST);
-   ReactDOM.render(<Demo/>, document.getElementById('container'));
- });
-
-
-function getIntrospection(fetcher) {
-  return fetcher({query: introspectionQuery})
-    .then(introspection => {
-      if (introspection.errors)
-        throw Error(JSON.stringify(introspection.errors, null, 2));
-      return introspection;
-    });
-}
-
-function getFetcher(url, headersObj?) {
-  return (graphQLParams) => {
     return fetch(url, {
       method: 'POST',
-      headers: new Headers({
-        "content-type": 'application/json',
-        ...headersObj,
-      }),
-      body: JSON.stringify(graphQLParams)
+      headers,
+      body: JSON.stringify({...graphQLParams, query})
     }).then(responce => {
       if (responce.ok)
         return responce.json();
       return responce.text().then(body => {
-        throw Error(`${responce.status} ${responce.statusText}\n${body}`);
+        let err;
+        try {
+          err = JSON.parse(body);
+        } catch(e) {
+          throw body;
+        }
+        throw err;
       });
-    })
-  };
+    }).then(result => ({
+      ...result,
+      data: transform(result.data)
+    }))
+  }
+
+  closeModal = () => {
+    this.setState({
+      ...this.state,
+      modalIsOpen: false,
+    });
+
+    localStorage.setItem('lodash-demo:helpModalWasClosed', 'true');
+  }
+
+  render() {
+    const modalStyles = {
+      overlay : {
+        zIndex: '100',
+        backgroundColor: 'rgba(0, 0, 0, 0.75)'
+      },
+      content : {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        width: '960px',
+        maxWidth: '90%',
+        height: '569px',
+        overflow: 'hidden',
+        border: 0,
+        padding: 0,
+        maxHeight: '90vh',
+        transform: 'translate(-50%, -50%)'
+      }
+    };
+
+    const closeButtonStyles:React.CSSProperties = {
+      fontSize: '40px',
+      lineHeight: '33px',
+      height: '40px',
+      verticalAlign: 'middle',
+      width: '40px',
+      textAlign: 'center',
+      top: '10px',
+      right: '10px',
+      background: 'white',
+      borderRadius: '100%',
+      position: 'absolute',
+      cursor: 'pointer'
+    };
+
+    return (
+      <div style={{height:'100vh'}}>
+        <GraphiQLTab onToolbar={this.onToolbar} fetcher={this.fetcher} app={this.state.config} tab={this.state.tab} hasClosed={false}/>
+        <Modal
+          contentLabel="Demo presentation iframe"
+          style={modalStyles}
+          isOpen={this.state.modalIsOpen}
+          onRequestClose={this.closeModal}
+        >
+          <i style={closeButtonStyles} onClick={this.closeModal}>×</i>
+          <iframe style={{maxHeight:'100%', maxWidth: '100%'}} allowFullScreen={true} frameBorder="0" width="960" height="569" src="https://docs.google.com/presentation/d/1aBXjC98hfYrbjUKlWGFMWgAMh9FcxeW_w97uatNYXls/embed?start=false&loop=false&delayms=3000" ></iframe>
+        </Modal>
+      </div>
+    )
+  }
 }
+
+ReactDOM.render(<Demo/>, document.getElementById('container'));
