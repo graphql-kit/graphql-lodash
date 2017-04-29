@@ -15,44 +15,11 @@ GraphQL Lodash gives you the power of `lodash` right inside your GraphQL Query u
 We encourage you to try it inside our [demo](https://apis.guru/graphql-lodash/). Here are a few query examples you can run against StartWars API:
 
 #### Find out a plannet with the biggest population
-```
-{
-  planetWithMaxPopulation: allPlanets @_(get: "planets") {
-    planets @_(maxBy: "population") {
-      name
-      population
-    }
-  }
-}
-```
+![Find out a plannet with the biggest population](docs/planet_with_max_population.png)
 #### Get gender statistics
-```
-{
-  genderStats: allPeople @_(get: "people") {
-    people @_(countBy: "gender") {
-      gender
-    }
-  }
-}
-```
+![Get gender statistics](docs/gender_stats.png)
 #### Map characters to films they are featured in
-```
-{
-  peopleToFilms: allPeople @_(get: "people") {
-    people @_(
-      keyBy: "name"
-      mapValues: "filmConnection.films"
-    ) {
-      name
-      filmConnection {
-        films @_(map: "title") {
-          title
-        }
-      }
-    }
-  }
-}
-```
+![Map characters to films they are featured in](docs/people_to_films.png)
 
 ## Install
 
