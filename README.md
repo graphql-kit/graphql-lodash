@@ -152,7 +152,7 @@ You can write a simple wrapper for simplicity:
 import { graphql } from 'react-apollo';
 import { graphqlLodash } from 'graphql-lodash';
 
-export function qqlLodash(rawQuery, config) {
+export function gqlLodash(rawQuery, config) {
   const {query, transform} = graphqlLodash(rawQuery);
   let origProps = (config && config.props) || ((props) => props);
 
@@ -165,10 +165,10 @@ export function qqlLodash(rawQuery, config) {
   })(comp);
 }
 // then use as bellow
-export default qqlLodash(query)(Component);
+export default gqlLodash(query)(Component);
 ```
 
-Just replace `graphql` with `qqlLodash` and you are ready to use lodash in your queries.
+Just replace `graphql` with `gqlLodash` and you are ready to use lodash in your queries.
 
 ## Usage on server side
 
