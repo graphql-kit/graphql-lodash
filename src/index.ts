@@ -28,10 +28,9 @@ import {
 
 import { lodashIDL } from './lodash_idl';
 
-export function graphqlLodash(query, operationName?) {
+export function graphqlLodash(query:string|DocumentNode, operationName?:string) {
   const pathToArgs = {};
-  const isQueryPassedAsString = typeof query === 'string';
-  const queryAST = isQueryPassedAsString ? parse(query) : query;
+  const queryAST = typeof query === 'string' ? parse(query) : query;
   traverseOperationFields(queryAST, operationName, (node, resultPath) => {
     var args = getLodashDirectiveArgs(node);
     if (args === null)
@@ -48,7 +47,7 @@ export function graphqlLodash(query, operationName?) {
 
   const stripedQuery = stripQuery(queryAST);
   return {
-    query: isQueryPassedAsString ? print(stripedQuery) : stripedQuery,
+    query: typeof query === 'string' ? print(stripedQuery) : stripedQuery,
     transform: data => applyLodashDirective(pathToArgs, data)
   };
 }
@@ -134,7 +133,7 @@ function applyOnPath(result, pathToArgs, cb) {
   }
 }
 
-function stripQuery(queryAST) {
+function stripQuery(queryAST):DocumentNode {
   return visit(queryAST, {
     [Kind.DIRECTIVE]: (node) => {
       if (node.name.value === '_')
