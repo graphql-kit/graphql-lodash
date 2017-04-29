@@ -1,12 +1,12 @@
 # GraphQL Lodash
 
-Unleash power of `lodash` inside your GraphQL queries
+Unleash power of [lodash](https://lodash.com/) inside your GraphQL queries
 
 ## Why?
 GraphQL allows to ask for what you need and get exactly that. But what about the shape?
 GraphQL Lodash gives you the power of `lodash` right inside your GraphQL Query using `@_` directive.
 
-![lodash usage gif](docs/lodash.gif)
+[![lodash usage gif](docs/lodash.gif)](https://apis.guru/graphql-lodash/)
 
 **Note**: This is an **experimental** project created to explore the concept of **Query and transformation collocation**.
 
