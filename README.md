@@ -1,5 +1,7 @@
 # GraphQL Lodash
 
+![GraphQL Lodash logo](docs/gqlodash-logo.png)
+
 Unleash power of [lodash](https://lodash.com/) inside your GraphQL queries
 
 ## Why?
