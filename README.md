@@ -131,6 +131,45 @@ Here is proposed solution for Relay:
 
 We are still figuring out how to do this and any [feedback](https://github.com/APIs-guru/graphql-lodash/issues/new) is welcome.
 
+#### Usage with [react-apollo](https://github.com/apollographql/react-apollo)
+
+When use with Apollo you can use `props` option to apply transformations:
+
+```js
+const rawQuery = gql`
+  # query with @_ directives
+`;
+
+const {query, transform} = graphqlLodash(rawQuery);
+export default graphql(query, {
+  props: (props) => ({...props, rawData: props.data, data: transform(props.data)})
+})(Component);
+```
+
+You can write a simple wrapper for simplicity:
+
+```js
+import { graphql } from 'react-apollo';
+import { graphqlLodash } from 'graphql-lodash';
+
+export function qqlLodash(rawQuery, config) {
+  const {query, transform} = graphqlLodash(rawQuery);
+  let origProps = (config && config.props) || ((props) => props);
+
+  return (comp) => graphql(query, {...config,
+    props: (props) => origProps({
+      ...props,
+      rawData: props.data,
+      data: transform(props.data)
+    })
+  })(comp);
+}
+// then use as bellow
+export default qqlLodash(query)(Component);
+```
+
+Just replace `graphql` with `qqlLodash` and you are ready to use lodash in your queries.
+
 ## Usage on server side
 
 In theory this tool can be used on the server. But this will break the contract and, most likely,
