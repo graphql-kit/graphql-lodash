@@ -1,9 +1,9 @@
+![GraphQL Lodash logo](docs/gqlodash-logo.png)
+
 # GraphQL Lodash
 [![npm](https://img.shields.io/npm/v/graphql-lodash.svg)](https://www.npmjs.com/package/graphql-lodash) [![David](https://img.shields.io/david/APIs-guru/graphql-lodash.svg)](https://david-dm.org/APIs-guru/graphql-lodash)
 [![David](https://img.shields.io/david/dev/APIs-guru/graphql-lodash.svg)](https://david-dm.org/APIs-guru/graphql-lodash?type=dev)
 [![npm](https://img.shields.io/npm/l/graphql-lodash.svg)](https://github.com/APIs-guru/graphql-lodash/blob/master/LICENSE)
-
-![GraphQL Lodash logo](docs/gqlodash-logo.png)
 
 Unleash power of [lodash](https://lodash.com/) inside your GraphQL queries
 
@@ -15,7 +15,8 @@ GraphQL Lodash gives you the power of `lodash` right inside your GraphQL Query u
 
 **Note**: This is an **experimental** project created to explore the concept of **Query and transformation collocation**.
 
-We encourage you to try it inside our [demo](https://apis.guru/graphql-lodash/). Here are a few query examples you can run against StartWars API:
+We encourage you to try it inside our [demo](https://apis.guru/graphql-lodash/) or check detailed [walkthrough](https://docs.google.com/presentation/d/1aBXjC98hfYrbjUKlWGFMWgAMh9FcxeW_w97uatNYXls/pub?start=false&loop=false&delayms=3000).
+Here are a few query examples you can run against StartWars API:
 
 #### Find out a plannet with the biggest population
 ![Find out a plannet with the biggest population](docs/planet_with_max_population.png)
@@ -70,7 +71,7 @@ function lodashQuery(queryWithLodash) {
 ### Fetch example
 An example of a simple client based on [fetch API](https://developer.mozilla.org/en/docs/Web/API/Fetch_API):
 ```js
-function executeGraphQLQuery(url, query) => {
+function executeGraphQLQuery(url, query) {
   return fetch(url, {
     method: 'POST',
     headers: new Headers({"content-type": 'application/json'}),
@@ -81,16 +82,26 @@ function executeGraphQLQuery(url, query) => {
     return responce.text().then(body => {
       throw Error(responce.status + ' ' + responce.statusText + '\n' + body);
     });
-  }
+  });
 }
 
-function lodashQuery(queryWithLodash) {
-  let { query, transform } = graphqlLodash(queryWithLodash);
-  return executeGraphQLQuery(query).then(result => {
+function lodashQuery(url, queryWithLodash) {
+  let { query, transform } = window.GQLLodash.graphqlLodash(queryWithLodash);
+  return executeGraphQLQuery(url, query).then(result => {
     result.data = transform(result.data);
     return result;
   });
 }
+
+// then use as bellow
+lodashQuery('https://swapi.apis.guru', `{
+  planetWithMaxPopulation: allPlanets @_(get: "planets") {
+    planets @_(maxBy: "population") {
+      name
+      population
+    }
+  }
+}`).then(result => console.log(result.data));
 ```
 
 ### Caching clients
@@ -139,6 +150,7 @@ export default gqlLodash(query)(Component);
 ```
 
 Just replace `graphql` with `gqlLodash` and you are ready to use lodash in your queries.
+Check out [react-apollo-lodash-demo](https://github.com/APIs-guru/react-apollo-lodash-demo) repo.
 
 ## Usage on server side
 
