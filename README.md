@@ -5,7 +5,7 @@
 [![David](https://img.shields.io/david/dev/APIs-guru/graphql-lodash.svg)](https://david-dm.org/APIs-guru/graphql-lodash?type=dev)
 [![npm](https://img.shields.io/npm/l/graphql-lodash.svg)](https://github.com/APIs-guru/graphql-lodash/blob/master/LICENSE)
 
-Unleash power of [lodash](https://lodash.com/) inside your GraphQL queries
+Unleash the power of [lodash](https://lodash.com/) inside your GraphQL queries
 
 ## Why?
 GraphQL allows to ask for what you need and get exactly that. But what about the shape?
@@ -76,11 +76,11 @@ function executeGraphQLQuery(url, query) {
     method: 'POST',
     headers: new Headers({"content-type": 'application/json'}),
     body: JSON.stringify({ query: query })
-  }).then(responce => {
-    if (responce.ok)
-      return responce.json();
-    return responce.text().then(body => {
-      throw Error(responce.status + ' ' + responce.statusText + '\n' + body);
+  }).then(response => {
+    if (response.ok)
+      return response.json();
+    return response.text().then(body => {
+      throw Error(response.status + ' ' + response.statusText + '\n' + body);
     });
   });
 }
@@ -105,7 +105,7 @@ lodashQuery('https://swapi.apis.guru', `{
 ```
 
 ### Caching clients
-For caching clients like Relay and Apollo we recomend to apply the transformation after the caching layer.
+For caching clients like Relay and Apollo we recommend to apply the transformation after the caching layer.
 Here is proposed solution for Relay:
 
 ![Relay usage](docs/relay-architecture.png)
@@ -114,7 +114,7 @@ We are still figuring out how to do this and any [feedback](https://github.com/A
 
 #### Usage with [react-apollo](https://github.com/apollographql/react-apollo)
 
-When use with Apollo you can use `props` option to apply transformations:
+When using with Apollo you can use `props` option to apply transformations:
 
 ```js
 const rawQuery = gql`
@@ -154,5 +154,5 @@ Check out [react-apollo-lodash-demo](https://github.com/APIs-guru/react-apollo-l
 
 ## Usage on server side
 
-In theory this tool can be used on the server. But this will break the contract and, most likely,
+In theory, this tool can be used on the server. But this will break the contract and, most likely,
 will break all the GraphQL tooling you use. Use it on server-side only if you know what you do.
