@@ -7,6 +7,16 @@
 
 Unleash the power of [lodash](https://lodash.com/) inside your GraphQL queries
 
+#### Table of contents
+- [Why?](#why)
+- [Example queries](#example-queries)
+- [API](#api)
+- [Usage Examples](#usage-examples)
+  - [`fetch`](#fetch-example)
+  - [Caching clients](#caching-clients)
+  - [**Usage with react-apollo**](#usage-with-react-apollo)
+- [Usage on server-side](#usage-on-server-side) (tl;dr **don't**)
+
 ## Why?
 GraphQL allows to ask for what you need and get exactly that. But what about the shape?
 GraphQL Lodash gives you the power of `lodash` right inside your GraphQL Query using `@_` directive.
@@ -16,6 +26,8 @@ GraphQL Lodash gives you the power of `lodash` right inside your GraphQL Query u
 **Note**: This is an **experimental** project created to explore the concept of **Query and transformation collocation**.
 
 We encourage you to try it inside our [demo](https://apis.guru/graphql-lodash/) or check detailed [walkthrough](https://docs.google.com/presentation/d/1aBXjC98hfYrbjUKlWGFMWgAMh9FcxeW_w97uatNYXls/pub?start=false&loop=false&delayms=3000).
+
+## Example queries
 Here are a few query examples you can run against StartWars API:
 
 #### Find out a pannet with the biggest population
