@@ -80,5 +80,5 @@ directive @_(
   keys: DummyArgument
   # Creates an array of the own enumerable string keyed property values of object.
   values: DummyArgument
-) on FIELD
+) on FIELD | QUERY
 `;

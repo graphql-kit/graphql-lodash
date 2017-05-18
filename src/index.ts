@@ -52,20 +52,19 @@ export function graphqlLodash(query:string|DocumentNode, operationName?:string) 
   };
 }
 
-function getLodashDirectiveArgs(fieldNode) {
+function getLodashDirectiveArgs(node) {
   let lodashNode = null;
 
-  for (let directive of fieldNode.directives) {
+  for (let directive of node.directives) {
     if (directive.name.value !== lodashDirectiveDef.name)
       continue;
     if (lodashNode)
-      throw Error(`Duplicating "@_" on the "${fieldNode.name.value}"`);
+      throw Error(`Duplicating "@_" on the "${node.name.value}"`);
     lodashNode = directive;
   }
 
   if (lodashNode === null)
     return null;
-
 
   const args = getArgumentValues(lodashDirectiveDef, lodashNode);
   //Restore order of arguments
@@ -85,25 +84,30 @@ function applyLodashDirective(pathToArgs, data) {
   if (data === null)
     return null;
 
-  const changedData = applyOnPath(data, pathToArgs, (path, object, lodashArgs) => {
-    for (const op in lodashArgs) {
-      const arg = lodashArgs[op];
-      const type = transformationToType[op];
-      const actualType = object.constructor.name;
-      if (type !== actualType) {
-        const pathStr = path.join('.');
-        throw Error(
-          `${pathStr}: "${op}" transformation expect "${type}" but got "${actualType}"`
-        );
-      }
-      object = transformations[type][op](object, arg);
-    }
-    return object;
-  });
-  return changedData;
+  const changedData = applyOnPath(data, pathToArgs);
+  return applyLodashArgs([], changedData, pathToArgs['@_']);
 }
 
-function applyOnPath(result, pathToArgs, cb) {
+function applyLodashArgs(path, object, args) {
+  if (!args)
+    return object;
+
+  for (const op in args) {
+    const arg = args[op];
+    const type = transformationToType[op];
+    const actualType = object.constructor.name;
+    if (type !== actualType) {
+      const pathStr = path.join('.');
+      throw Error(
+        `${pathStr}: "${op}" transformation expect "${type}" but got "${actualType}"`
+      );
+    }
+    object = transformations[type][op](object, arg);
+  }
+  return object;
+}
+
+function applyOnPath(result, pathToArgs) {
   const currentPath = [];
   return traverse(result, pathToArgs);
 
@@ -124,8 +128,7 @@ function applyOnPath(result, pathToArgs, cb) {
         continue;
 
       const lodashArgs = pathRoot[key]['@_'];
-      if (lodashArgs)
-        changedValue = cb(currentPath, changedValue, lodashArgs);
+      changedValue = applyLodashArgs(currentPath, changedValue, lodashArgs);
       changedObject[key] = changedValue;
       currentPath.pop();
     }
@@ -201,6 +204,7 @@ function traverseOperationFields(queryAST, operationName, cb) {
   });
 
   const resultPath = [];
+  cb(operationAST, resultPath);
   traverse(operationAST);
 
   function traverse(root) {
