@@ -96,7 +96,9 @@ function applyLodashArgs(path, object, args) {
     const arg = args[op];
 
     const type = (op === 'each' ? 'Array' : transformationToType[op]);
-    const actualType = object.constructor.name;
+    let actualType = object.constructor && object.constructor.name;
+    // handle objects created with Object.create(null)
+    if (!actualType && (typeof object === 'object')) actualType = 'Object';
     if (type !== actualType) {
       const pathStr = path.join('.');
       throw Error(
