@@ -94,7 +94,8 @@ function applyLodashArgs(path, object, args) {
 
   for (const op in args) {
     const arg = args[op];
-    const type = transformationToType[op];
+
+    const type = (op === 'each' ? 'Array' : transformationToType[op]);
     const actualType = object.constructor.name;
     if (type !== actualType) {
       const pathStr = path.join('.');
@@ -102,7 +103,11 @@ function applyLodashArgs(path, object, args) {
         `${pathStr}: "${op}" transformation expect "${type}" but got "${actualType}"`
       );
     }
-    object = transformations[type][op](object, arg);
+
+    if (op === 'each')
+      object = object.map((item, idx) => applyLodashArgs(path.concat(idx), item, arg));
+    else
+      object = transformations[type][op](object, arg);
   }
   return object;
 }
