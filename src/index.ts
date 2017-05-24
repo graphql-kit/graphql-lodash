@@ -19,6 +19,8 @@ import {
 
 import get from 'lodash/get.js';
 import set from 'lodash/set.js';
+import each from 'lodash/each.js';
+import keyBy from 'lodash/keyBy.js';
 import isEqual from 'lodash/isEqual.js';
 
 import {
@@ -67,16 +69,21 @@ function getLodashDirectiveArgs(node) {
     return null;
 
   const args = getArgumentValues(lodashDirectiveDef, lodashNode);
+  return normalizeLodashArgs(lodashNode.arguments, args);
+}
+
+function normalizeLodashArgs(argNodes, args) {
   //Restore order of arguments
-  const argsNames = lodashNode.arguments.map(node => node.name.value);
+  argNodes = keyBy(argNodes, argNode => argNode.name.value);
   const orderedArgs = {};
-  for (const name of argsNames) {
+  each(argNodes, (node, name) => {
     if (lodashDirectiveArgTypes[name].name === 'DummyArgument')
       orderedArgs[name] = undefined;
+    else if (name === 'each')
+      orderedArgs[name] = normalizeLodashArgs(node.value.fields, args[name]);
     else
       orderedArgs[name] = args[name];
-  }
-
+  });
   return orderedArgs;
 }
 
@@ -98,7 +105,9 @@ function applyLodashArgs(path, object, args) {
     const type = (op === 'each' ? 'Array' : transformationToType[op]);
     let actualType = object.constructor && object.constructor.name;
     // handle objects created with Object.create(null)
-    if (!actualType && (typeof object === 'object')) actualType = 'Object';
+    if (!actualType && (typeof object === 'object'))
+      actualType = 'Object';
+
     if (type !== actualType) {
       const pathStr = path.join('.');
       throw Error(
