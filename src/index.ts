@@ -133,7 +133,7 @@ function applyOnPath(result, pathToArgs) {
     if (Array.isArray(root))
       return root.map(item => traverse(item, pathRoot));
 
-    const changedObject = Object.assign(root);
+    const changedObject = Object.assign({}, root);
     for (const key in pathRoot) {
       if (key === '@_')
         continue;
