@@ -23,10 +23,7 @@ import each from 'lodash/each.js';
 import keyBy from 'lodash/keyBy.js';
 import isEqual from 'lodash/isEqual.js';
 
-import {
-  transformations,
-  transformationToType
-} from './transformations';
+import { applyTransformations } from './transformations';
 
 import { lodashIDL } from './lodash_idl';
 
@@ -73,16 +70,28 @@ function getLodashDirectiveArgs(node) {
 }
 
 function normalizeLodashArgs(argNodes, args) {
+  if (!argNodes)
+    return args;
+
   //Restore order of arguments
   argNodes = keyBy(argNodes, argNode => argNode.name.value);
   const orderedArgs = {};
   each(argNodes, (node, name) => {
-    if (lodashDirectiveArgTypes[name].name === 'DummyArgument')
+    const argValue = args[name];
+
+    if (node.value.kind === 'ObjectValue')
+      orderedArgs[name] = normalizeLodashArgs(node.value.fields, argValue);
+    else if (node.value.kind === 'ListValue') {
+      const nodeValues = node.value.values;
+
+      orderedArgs[name] = [];
+      for (let i = 0; i < nodeValues.length; ++i)
+        orderedArgs[name][i] = normalizeLodashArgs(nodeValues[i].fields, argValue[i]);
+    }
+    else if (node.value.kind === 'EnumValue' && node.value.value === 'none')
       orderedArgs[name] = undefined;
-    else if (name === 'each')
-      orderedArgs[name] = normalizeLodashArgs(node.value.fields, args[name]);
     else
-      orderedArgs[name] = args[name];
+      orderedArgs[name] = argValue;
   });
   return orderedArgs;
 }
@@ -96,31 +105,13 @@ function applyLodashDirective(pathToArgs, data) {
 }
 
 function applyLodashArgs(path, object, args) {
-  if (!args)
-    return object;
-
-  for (const op in args) {
-    const arg = args[op];
-
-    const type = (op === 'each' ? 'Array' : transformationToType[op]);
-    let actualType = object.constructor && object.constructor.name;
-    // handle objects created with Object.create(null)
-    if (!actualType && (typeof object === 'object'))
-      actualType = 'Object';
-
-    if (type !== actualType) {
-      const pathStr = path.join('.');
-      throw Error(
-        `${pathStr}: "${op}" transformation expect "${type}" but got "${actualType}"`
-      );
-    }
-
-    if (op === 'each')
-      object = object.map((item, idx) => applyLodashArgs(path.concat(idx), item, arg));
-    else
-      object = transformations[type][op](object, arg);
+  try {
+    return applyTransformations(object, args);
+  } catch (e) {
+    // FIXME:
+    console.log(path);
+    throw e;
   }
-  return object;
 }
 
 function applyOnPath(result, pathToArgs) {
@@ -163,10 +154,6 @@ function stripQuery(queryAST):DocumentNode {
 
 export const lodashDirectiveAST:DocumentNode = parse(new Source(lodashIDL, 'lodashIDL'));
 const lodashDirectiveDef = getDirectivesFromAST(lodashDirectiveAST)[0];
-const lodashDirectiveArgTypes = lodashDirectiveDef.args.reduce((obj, arg) => {
-  obj[arg.name] = arg.type;
-  return obj;
-}, {});
 
 function getDirectivesFromAST(ast) {
   const dummyIDL = `
