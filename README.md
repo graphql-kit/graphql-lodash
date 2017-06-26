@@ -30,8 +30,8 @@ We encourage you to try it inside our [demo](https://apis.guru/graphql-lodash/) 
 ## Example queries
 Here are a few query examples you can run against StartWars API:
 
-#### Find out a pannet with the biggest population
-![Find out a planet with the biggest population](docs/planet_with_max_population.png)
+#### Find the planet with the biggest population
+![Find the planet with the biggest population](docs/planet_with_max_population.png)
 #### Get gender statistics
 ![Get gender statistics](docs/gender_stats.png)
 #### Map characters to films they are featured in
