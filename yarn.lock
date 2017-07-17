@@ -1099,9 +1099,9 @@ depd@1.1.0, depd@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.0.tgz#e1bd82c6aab6ced965b97b88b17ed3e528ca18c3"
 
-deploy-to-gh-pages@^1.3.3:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/deploy-to-gh-pages/-/deploy-to-gh-pages-1.3.3.tgz#e5c98f6506a8b2495874ac3099c252e6f9f27ea9"
+deploy-to-gh-pages@^1.3.6:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/deploy-to-gh-pages/-/deploy-to-gh-pages-1.3.6.tgz#825a56a0a08aee792b7014eca87538b7e888dfee"
   dependencies:
     yargs "^4.7.1"
 
