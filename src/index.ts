@@ -27,7 +27,7 @@ import { applyTransformations } from './transformations';
 
 import { lodashIDL } from './lodash_idl';
 
-export function graphqlLodash(query:string|DocumentNode, operationName?:string) {
+export function graphqlLodash(query: string | DocumentNode, operationName?: string) {
   const pathToArgs = {};
   const queryAST = typeof query === 'string' ? parse(query) : query;
   traverseOperationFields(queryAST, operationName, (node, resultPath) => {
@@ -124,26 +124,30 @@ function applyOnPath(result, pathToArgs) {
     if (Array.isArray(root))
       return root.map(item => traverse(item, pathRoot));
 
-    const changedObject = Object.assign({}, root);
-    for (const key in pathRoot) {
-      if (key === '@_')
-        continue;
-      currentPath.push(key);
+    if (typeof root === 'object') {
+      const changedObject = Object.assign({}, root);
+      for (const key in pathRoot) {
+        if (key === '@_')
+          continue;
+        currentPath.push(key);
 
-      let changedValue = traverse(root[key], pathRoot[key]);
-      if (changedValue === null || changedValue === undefined)
-        continue;
+        let changedValue = traverse(root[key], pathRoot[key]);
+        if (changedValue === null || changedValue === undefined)
+          continue;
 
-      const lodashArgs = pathRoot[key]['@_'];
-      changedValue = applyLodashArgs(currentPath, changedValue, lodashArgs);
-      changedObject[key] = changedValue;
-      currentPath.pop();
+        const lodashArgs = pathRoot[key]['@_'];
+        changedValue = applyLodashArgs(currentPath, changedValue, lodashArgs);
+        changedObject[key] = changedValue;
+        currentPath.pop();
+      }
+      return changedObject;
+    } else {
+      return root;
     }
-    return changedObject;
   }
 }
 
-function stripQuery(queryAST):DocumentNode {
+function stripQuery(queryAST): DocumentNode {
   return visit(queryAST, {
     [Kind.DIRECTIVE]: (node) => {
       if (node.name.value === '_')
@@ -152,7 +156,7 @@ function stripQuery(queryAST):DocumentNode {
   });
 }
 
-export const lodashDirectiveAST:DocumentNode = parse(new Source(lodashIDL, 'lodashIDL'));
+export const lodashDirectiveAST: DocumentNode = parse(new Source(lodashIDL, 'lodashIDL'));
 const lodashDirectiveDef = getDirectivesFromAST(lodashDirectiveAST)[0];
 
 function getDirectivesFromAST(ast) {
@@ -185,7 +189,7 @@ function astToJSON(ast) {
     case Kind.LIST:
       return ast.values.map(astToJSON);
     case Kind.OBJECT:
-      return ast.fields.reduce((object, {name, value}) => {
+      return ast.fields.reduce((object, { name, value }) => {
         object[name.value] = astToJSON(value);
         return object;
       }, {});
