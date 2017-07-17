@@ -45,7 +45,7 @@
     "webpack-dev-server": "^2.4.5"
   },
   "name": "graphql-lodash",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "main": "lib/graphql-lodash.bundle.js",
   "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
