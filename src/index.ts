@@ -17,11 +17,11 @@ import {
   getArgumentValues,
 } from 'graphql/execution/values';
 
-import get from 'lodash/get.js';
-import set from 'lodash/set.js';
-import each from 'lodash/each.js';
-import keyBy from 'lodash/keyBy.js';
-import isEqual from 'lodash/isEqual.js';
+import get from 'lodash-es/get';
+import set from 'lodash-es/set';
+import each from 'lodash-es/each';
+import keyBy from 'lodash-es/keyBy';
+import isEqual from 'lodash-es/isEqual';
 
 import { applyTransformations } from './transformations';
 
@@ -168,8 +168,8 @@ function getDirectivesFromAST(ast) {
   const fullAST = concatAST([ast, parse(dummyIDL)]);
   const schema = buildASTSchema(fullAST);
 
-  schema.getTypeMap()['Path'].parseLiteral = (x => x.value);
-  schema.getTypeMap()['JSON'].parseLiteral = astToJSON;
+  (schema.getTypeMap()['Path'] as any).parseLiteral = (x => x.value);
+  (schema.getTypeMap()['JSON'] as any).parseLiteral = astToJSON;
 
   return schema.getDirectives();
 }

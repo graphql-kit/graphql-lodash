@@ -15,7 +15,7 @@
     "types": [
       "webpack"
     ],
-    "lib": ["es2016", "DOM"],
+    "lib": ["es2017", "DOM", "esnext.asynciterable"],
     "jsx": "react"
   },
   "compileOnSave": false,
