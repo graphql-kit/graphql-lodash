@@ -8,9 +8,6 @@
     "build:bundle": "webpack -p --config webpack.config.js",
     "build:package": "rimraf lib/ && npm run tsc && npm run build:bundle"
   },
-  "resolutions": {
-    "graphql": "^0.11.7"
-  },
   "dependencies": {
     "graphql": "^0.11.7",
     "lodash-es": "^4.17.4"
