@@ -54,7 +54,7 @@ export function graphqlLodash(query: string | DocumentNode, operationName?: stri
 function getLodashDirectiveArgs(node) {
   let lodashNode = null;
 
-  for (let directive of node.directives) {
+  for (let directive of node.directives || []) {
     if (directive.name.value !== lodashDirectiveDef.name)
       continue;
     if (lodashNode)
