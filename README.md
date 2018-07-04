@@ -162,7 +162,56 @@ export default gqlLodash(query)(Component);
 ```
 
 Just replace `graphql` with `gqlLodash` and you are ready to use lodash in your queries.
-Check out [react-apollo-lodash-demo](https://github.com/APIs-guru/react-apollo-lodash-demo) repo.
+Check out the [react-apollo-lodash-demo](https://github.com/APIs-guru/react-apollo-lodash-demo) repo.
+
+You can also do the transformation inside an [Apollo
+Link](https://www.apollographql.com/docs/link/) by rewriting the
+parsed GraphQL `Document`:
+
+```js
+new ApolloLink((operation, forward) => {
+  const { query, transform } = graphqlLodash(operation.query);
+  operation.query = query;
+  return forward(operation)
+    .map(response => ({
+      ...response,
+      data: transform(response.data),
+    }));
+});
+```
+
+Chaining this link with the other links passed to your `ApolloClient`
+will apply the transformation to every query that
+Apollo runs, such as those from the `<Query />` component or
+subscriptions.
+
+### Introspection queries
+
+If your application uses introspection queries (like GraphiQL does to
+get documentation and autocomplete information), you will also need to
+extend the introspection query result with the directives from
+graphql-lodash. One way you could do this is:
+
+```js
+import {
+  buildClientSchema,
+  extendSchema,
+  graphqlSync,
+  introspectionQuery,
+} from 'graphql';
+
+// inside the above ApolloLink function
+if (response.data && response.data.__schema) {
+  const schema = extendSchema(
+    buildClientSchema(response.data),
+    lodashDirectiveAST,
+  );
+  return graphqlSync(schema, introspectionQuery);
+}
+```
+
+See the `demo/` source in this repo for another example of modifying
+the introspection query result.
 
 ## Usage on server side
 
