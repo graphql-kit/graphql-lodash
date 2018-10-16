@@ -4,7 +4,6 @@ import * as ReactDOM from 'react-dom';
 import fetch from 'isomorphic-fetch';
 import Modal from 'react-modal';
 
-
 import {
   extendSchema,
   buildClientSchema,
@@ -55,8 +54,8 @@ const defaultTabConfig = {
 };
 
 export class Demo extends React.Component<null, any> {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     let config = new AppConfig("graphiql", workspaceOptions);
 
     let tab = new TabConfig('tab', defaultTabConfig);
@@ -93,6 +92,7 @@ export class Demo extends React.Component<null, any> {
     return fetch(url, {
       method: 'POST',
       headers,
+      credentials: 'omit',
       body: JSON.stringify({...graphQLParams, query})
     }).then(responce => {
       if (responce.ok)
