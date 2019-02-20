@@ -7,7 +7,7 @@
     "tsc": "tsc",
     "build:bundle": "webpack -p --config webpack.config.js",
     "build:package": "rimraf lib/ && npm run tsc && npm run build:bundle",
-    "build:dist": "npm run build:bundle && cp lib/graphql-lodash.bundle.js dist/graphql-lodash.bundle.js"
+    "install": "npm run build:bundle"
   },
   "dependencies": {
     "graphql": "^0.11.7",
