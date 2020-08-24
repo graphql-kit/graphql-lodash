@@ -53,7 +53,7 @@ const defaultTabConfig = {
   variables: ''
 };
 
-export class Demo extends React.Component<null, any> {
+export class Demo extends React.Component<{}, any> {
   constructor(props) {
     super(props);
     let config = new AppConfig("graphiql", workspaceOptions);

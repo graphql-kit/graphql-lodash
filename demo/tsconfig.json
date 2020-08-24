@@ -2,23 +2,16 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "module": "es2015",
+    "sourceMap": true,
     "target": "es5",
     "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "sourceMap": true,
-    "declaration": true,
-    "outDir": "lib",
-    "pretty": true,
+    "outDir": "dist",
     "moduleResolution": "node",
-    "lib": ["es2017"]
+    "lib": ["es2017", "dom"],
+    "jsx": "react",
+    "esModuleInterop": true
   },
-  "compileOnSave": false,
-  "exclude": [
-    "demo",
-    "node_modules",
-    ".tmp",
-    "lib"
-  ]
+  "include": ["./custom.d.ts", "**/*.tsx", "**/*.ts"]
 }

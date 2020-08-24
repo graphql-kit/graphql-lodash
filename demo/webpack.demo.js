@@ -1,45 +1,38 @@
-const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
-
-function root(args) {
-  args = Array.prototype.slice.call(arguments, 0);
-  return path.join.apply(path, [__dirname].concat(args));
-}
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   devtool: 'source-map',
-  performance: {
-    hints: false
-  },
   devServer: {
-    contentBase: root('.'),
+    contentBase: __dirname,
     watchContentBase: true,
     port: 9005,
-    stats: 'errors-only'
   },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json']
-  },
-  entry: ['./demo/index.tsx'],
-  output: {
-    path: root('.'),
-    filename: 'bundle.js',
-    sourceMapFilename: '[file].map'
-  },
+  entry: './demo/index.tsx',
+  plugins: [new MiniCssExtractPlugin({ filename: 'bundle.css' })],
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: ['awesome-typescript-loader'],
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({ use: 'css-loader' }),
+        use: [
+          'style-loader',
+          MiniCssExtractPlugin.loader,
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+        ],
       },
     ],
   },
-  plugins: [
-    new ExtractTextPlugin({filename: 'bundle.css', allChunks: true}),
-  ]
-}
+  resolve: {
+    extensions: ['.tsx', '.ts', '.mjs', '.js'],
+  },
+  output: {
+    path: __dirname,
+    filename: 'bundle.js',
+    sourceMapFilename: '[file].map'
+  },
+};

@@ -40,20 +40,20 @@
     "@types/lodash-es": "4.17.3",
     "@types/react": "15.6.28",
     "@types/react-dom": "15.5.12",
-    "@types/webpack": "3.8.19",
-    "awesome-typescript-loader": "3.5.0",
-    "css-loader": "0.28.7",
+    "css-loader": "4.2.1",
     "deploy-to-gh-pages": "1.3.7",
-    "extract-text-webpack-plugin": "3.0.2",
     "graphiql": "0.11.10",
     "graphiql-workspace": "github:apis-guru/graphiql-workspace#tab-fork-dist",
+    "mini-css-extract-plugin": "^0.10.0",
     "react": "15.5.4",
     "react-dom": "15.5.4",
     "react-modal": "3.11.2",
     "rimraf": "2.7.1",
-    "style-loader": "0.19.1",
-    "typescript": "2.9.2",
-    "webpack": "3.12.0",
-    "webpack-dev-server": "2.11.5"
+    "style-loader": "1.2.1",
+    "ts-loader": "^8.0.3",
+    "typescript": "3.6.3",
+    "webpack": "4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "3.11.0"
   }
 }
