@@ -1,5 +1,28 @@
 {
+  "name": "graphql-lodash",
   "description": "GraphQL Lodash",
+  "keywords": [
+    "GraphQL",
+    "lodash",
+    "underscore",
+    "fp",
+    "functional"
+  ],
+  "license": "MIT",
+  "author": "APIs.guru <founders@apis.guru>",
+  "homepage": "https://github.com/APIs-guru/graphql-lodash#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/APIs-guru/graphql-lodash.git"
+  },
+  "bugs": {
+    "url": "https://github.com/APIs-guru/graphql-lodash/issues"
+  },
+  "version": "1.3.4",
+  "main": "lib/graphql-lodash.bundle.js",
+  "module": "lib/index.js",
+  "jsnext:main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --config demo/webpack.demo.js",
     "build:demo": "webpack -p --config demo/webpack.demo.js",
@@ -32,28 +55,5 @@
     "typescript": "2.9.2",
     "webpack": "3.12.0",
     "webpack-dev-server": "2.11.5"
-  },
-  "name": "graphql-lodash",
-  "version": "1.3.4",
-  "main": "lib/graphql-lodash.bundle.js",
-  "module": "lib/index.js",
-  "jsnext:main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/APIs-guru/graphql-lodash.git"
-  },
-  "keywords": [
-    "GraphQL",
-    "lodash",
-    "underscore",
-    "fp",
-    "functional"
-  ],
-  "author": "APIs.guru <founders@apis.guru>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/APIs-guru/graphql-lodash/issues"
-  },
-  "homepage": "https://github.com/APIs-guru/graphql-lodash#readme"
+  }
 }
