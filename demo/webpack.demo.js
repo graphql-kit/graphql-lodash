@@ -31,15 +31,13 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: [
-          'awesome-typescript-loader'
-        ]
+        use: ['awesome-typescript-loader'],
       },
-      {test: /\.scss$/, use: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader?sourceMap!sass-loader?sourceMap'})},
-      {test: /\.css$/, use: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader'})},
-      {test: /\.(woff2?|ttf|eot|svg)$/, use: 'url-loader?limit=10000'},
-      {test: /bootstrap-sass[\\\/].*\.js/, use: 'imports-loader?jQuery=jquery'}
-    ]
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({ use: 'css-loader' }),
+      },
+    ],
   },
   plugins: [
     new ExtractTextPlugin({filename: 'bundle.css', allChunks: true}),

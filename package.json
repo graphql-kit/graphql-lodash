@@ -24,7 +24,6 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "graphiql": "^0.11.10",
     "graphiql-workspace": "github:apis-guru/graphiql-workspace#tab-fork-dist",
-    "imports-loader": "^0.7.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-modal": "^3.1.2",
