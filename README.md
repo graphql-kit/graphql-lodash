@@ -59,7 +59,7 @@ or
 }
 ```
 - **query** - the original query with stripped `@_` directives
-- **transform** - function that recieves `response.data` as a single argument and returns
+- **transform** - function that receives `response.data` as a single argument and returns
 the same data in the intended shape.
 
 
