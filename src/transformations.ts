@@ -30,6 +30,7 @@ import maxBy from 'lodash-es/maxBy';
 import meanBy from 'lodash-es/meanBy';
 import sumBy from 'lodash-es/sumBy';
 import join from 'lodash-es/join';
+import expression from 'lodash-es/join';
 
 import get from 'lodash-es/get';
 import mapValues from 'lodash-es/mapValues';
@@ -40,10 +41,17 @@ import invertBy from 'lodash-es/invertBy';
 import keys from 'lodash-es/keys';
 import values from 'lodash-es/values';
 
+const compute = function(scope, expression) {
+  return _.template("<%= " + expression + " %>")(scope);
+}
+
 const transformations = {
   Array: {
     each: (array, arg) => {
       return map(array, item => applyTransformations(item, arg));
+    },  
+    mapCompute: (array, arg) => {
+      return compute(array, item => applyTransformations(item, arg));
     },
     map,
     keyBy,
@@ -84,6 +92,7 @@ const transformations = {
     invertBy,
     keys,
     values,
+    compute,
   },
   Number: {
     lt,
