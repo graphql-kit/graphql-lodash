@@ -59,6 +59,7 @@ const lodashProps = `
 
   get: Path
   mapValues: Path
+  compute: Path
 
   # Creates an array of values corresponding to paths of object.
   at: [Path!]
